@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: glimr-server
+spec:
+  replicas: 2 # Run two copies for reliability
+  selector:
+    matchLabels:
+      app: glimr-server
+  template:
+    metadata:
+      labels:
+        app: glimr-server
+    spec:
+      containers:
+        - name: server
+          image: glimracr.azurecr.io/glimr-server:latest # Match your ACR name
+          ports:
+            - containerPort: 3001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: glimr-server-service
+spec:
+  type: LoadBalancer # This creates a Public IP address
+  selector:
+    app: glimr-server
+  ports:
+    - protocol: TCP
+      port: 80 # External port (Public)
+      targetPort: 3001 # Internal port (App)

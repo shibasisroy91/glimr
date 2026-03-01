@@ -1,0 +1,35 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/server/**"
+      - "package.json"
+      - "package-lock.json"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Log in to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Log in to ACR
+        run: az acr login --name glimracr
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build \
+            -t glimracr.azurecr.io/glimr-server:${{ github.sha }} \
+            -t glimracr.azurecr.io/glimr-server:latest \
+            -f apps/server/Dockerfile .
+
+          docker push glimracr.azurecr.io/glimr-server:${{ github.sha }}
+          docker push glimracr.azurecr.io/glimr-server:latest

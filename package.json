@@ -1,13 +1,12 @@
 {
   "name": "glimr",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
+  "private": true,
+  "description": "AI assisted chat application services",
+  "author": "Shibasis Roy",
   "license": "ISC",
-  "packageManager": "pnpm@10.30.3"
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
 }
