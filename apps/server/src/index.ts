@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { createServer } from "http";
 import { Server, Socket } from "socket.io";
+import { GlimrMessage } from "@glimr/shared";
 
 const app = express();
 const httpServer = createServer(app);
