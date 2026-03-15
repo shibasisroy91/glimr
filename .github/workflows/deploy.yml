@@ -1,0 +1,45 @@
+name: Deploy Glimr to AWS
+
+on:
+  push:
+    branches: [main] # Triggers only when you push to main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    # These permissions are needed for the AWS login action
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, Tag, and Push Image to ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: glimr-server
+          IMAGE_TAG: latest
+        run: |
+          # Build from the root context so Docker can see /packages/shared
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f apps/server/Dockerfile .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Note on App Runner
+        run: |
+          echo "Deployment initiated. AWS App Runner is configured to auto-deploy when the ECR image is updated."

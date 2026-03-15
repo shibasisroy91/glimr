@@ -1,4 +1,11 @@
-iac/.terraform
+infra/.terraform
+infra/.terraform.lock.hcl
+infra/terraform.tfstate
+infra/terraform.tfstate.backup
+infra/*.tfstate
+infra/*.tfstate.backup
+infra/*.tfvars
+infra/*.tfvars.json
 
 node_modules
 
